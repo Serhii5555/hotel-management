@@ -22,6 +22,13 @@ namespace HotelManagement.Controllers
             _roomsTypes = roomsTypes;
         }
 
+        private async Task PopulateViewBagAsync()
+        {
+            ViewBag.Guests = new SelectList(await _guests.GetAllGuestsAsync(), "guest_id", "guest_display");
+            ViewBag.Rooms = new SelectList(await _rooms.GetAllRoomsAsync(), "room_id", "room_number");
+        }
+
+
         public async Task<IActionResult> Index()
         {
             var bookings = await _bookings.GetAllBookingsAsync();
@@ -39,8 +46,7 @@ namespace HotelManagement.Controllers
                 check_out_date = checkOutDate,
             };
 
-            ViewBag.Guests = new SelectList(await _guests.GetAllGuestsAsync(), "guest_id", "guest_display");
-            ViewBag.Rooms = new SelectList(await _rooms.GetAllRoomsAsync(), "room_id", "room_number");
+            await PopulateViewBagAsync();
 
             return View(model);
         }
@@ -51,8 +57,7 @@ namespace HotelManagement.Controllers
         {
             if (!ModelState.IsValid)
             {
-                ViewBag.Guests = new SelectList(await _guests.GetAllGuestsAsync(), "guest_id", "guest_display");
-                ViewBag.Rooms = new SelectList(await _rooms.GetAllRoomsAsync(), "room_id", "room_number");
+                await PopulateViewBagAsync();
 
                 return View(booking);
             }
@@ -65,8 +70,7 @@ namespace HotelManagement.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
-            ViewBag.Guests = new SelectList(await _guests.GetAllGuestsAsync(), "guest_id", "guest_display");
-            ViewBag.Rooms = new SelectList(await _rooms.GetAllRoomsAsync(), "room_id", "room_number");
+            await PopulateViewBagAsync();
 
             var booking = await _bookings.GetBookingByIdAsync(id);
             if (booking == null)
@@ -87,8 +91,7 @@ namespace HotelManagement.Controllers
                 return RedirectToAction("Index");
             }
 
-            ViewBag.Guests = new SelectList(await _guests.GetAllGuestsAsync(), "guest_id", "guest_display");
-            ViewBag.Rooms = new SelectList(await _rooms.GetAllRoomsAsync(), "room_id", "room_number");
+            await PopulateViewBagAsync();
 
             return View(booking);
         }
@@ -150,3 +153,5 @@ namespace HotelManagement.Controllers
 
     }
 }
+
+

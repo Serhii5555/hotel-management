@@ -1,0 +1,62 @@
+﻿@model HotelManagement.Models.Guest
+
+<div class="mx-auto py-5 px-5 max-w-lg">
+    <h1 class="text-4xl font-bold text-center mb-6">Edit Guest</h1>
+
+    <form id="editForm" asp-controller="Guests" asp-action="Edit" method="post" class="space-y-4">
+        <input type="hidden" id="editGuestId" name="guest_id" value="@Model.guest_id" />
+
+        <div class="mb-4">
+            <label for="firstName" class="block text-sm font-medium text-gray-700">First Name</label>
+            <input asp-for="first_name" type="text" class="mt-1 block w-full border-0 border-b-2 border-gray-300 py-1 outline-none focus:border-gray-700 px-2" maxlength="50" />
+            <span asp-validation-for="first_name" class="text-danger text-red-500"></span>
+        </div>
+
+        <div class="mb-4">
+            <label for="lastName" class="block text-sm font-medium text-gray-700">Last Name</label>
+            <input asp-for="last_name" type="text" class="mt-1 block w-full border-0 border-b-2 border-gray-300 py-1 outline-none focus:border-gray-700 px-2" maxlength="50" />
+            <span asp-validation-for="last_name" class="text-danger text-red-500"></span>
+        </div>
+
+        <div class="mb-4">
+            <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+            <input asp-for="email" type="email" class="mt-1 block w-full border-0 border-b-2 border-gray-300 py-1 outline-none focus:border-gray-700 px-2" maxlength="100" />
+            <span asp-validation-for="email" class="text-danger text-red-500"></span>
+        </div>
+
+        <div class="mb-4">
+            <label for="phoneNumber" class="block text-sm font-medium text-gray-700">Phone Number</label>
+            <input asp-for="phone_number" type="tel" class="mt-1 block w-full border-0 border-b-2 border-gray-300 py-1 outline-none focus:border-gray-700 px-2" maxlength="20" />
+            <span asp-validation-for="phone_number" class="text-danger text-red-500"></span>
+        </div>
+
+        <div class="mb-4">
+            <label for="passportCode" class="block text-sm font-medium text-gray-700">Passport Code</label>
+            <input asp-for="passport_code" type="text" class="mt-1 block w-full border-0 border-b-2 border-gray-300 py-1 outline-none focus:border-gray-700 px-2" maxlength="20" />
+            <span asp-validation-for="passport_code" class="text-danger text-red-500"></span>
+        </div>
+
+        <div class="mb-4">
+            <label for="dateOfBirth" class="block text-sm font-medium text-gray-700">Date of Birth</label>
+            <input asp-for="date_of_birth" type="date" class="mt-1 block w-full border-0 border-b-2 border-gray-300 py-1 outline-none focus:border-gray-700 px-2" />
+            <span asp-validation-for="date_of_birth" class="text-danger text-red-500"></span>
+        </div>
+
+        <div class="mb-4">
+            <label for="nationality" class="block text-sm font-medium text-gray-700">Nationality</label>
+            <input asp-for="nationality" type="text" class="mt-1 block w-full border-0 border-b-2 border-gray-300 py-1 outline-none focus:border-gray-700 px-2" maxlength="50" />
+            <span asp-validation-for="nationality" class="text-danger text-red-500"></span>
+        </div>
+
+        <div class="px-3 py-1 flex justify-between">
+            <a href="@Url.Action("Index", "Guests")" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-md mr-2">Cancel</a>
+            <button type="submit" class="bg-indigo-700 hover:bg-indigo-800 text-white px-4 py-2 rounded-md">Update</button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

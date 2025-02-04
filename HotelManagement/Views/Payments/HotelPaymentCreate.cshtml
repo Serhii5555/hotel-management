@@ -1,0 +1,70 @@
+﻿@model HotelManagement.Models.Payment
+
+@{
+    ViewData["Title"] = "Create Hotel Payment";
+    var bookings = ViewBag.Bookings as IEnumerable<Booking>;
+}
+
+<div class="mx-auto py-5 px-5 max-w-lg">
+    <h1 class="text-4xl font-bold text-center mb-6">Hotel Payment</h1>
+
+    <form asp-controller="Payments" asp-action="HotelPaymentCreate" method="post" class="space-y-4">
+        <div class="mb-4">
+            <label for="booking_id" class="block text-sm font-medium text-gray-700">Booking ID | Guest Full Name | Room Number</label>
+            <select id="booking_id" asp-for="booking_id" class="mt-1 block w-full border-0 border-b-2 border-gray-300 py-1 outline-none focus:border-gray-700 px-2">
+                <option value="" disabled selected>Select Booking</option>
+                @foreach (var booking in (IEnumerable<Booking>)ViewBag.Bookings)
+                {
+                    <option value="@booking.booking_id">@booking.full_booking_display</option>
+                }
+            </select>
+            <span asp-validation-for="booking_id" class="text-danger text-red-500"></span>
+        </div>
+
+        <div class="mb-4">
+            <label for="payment_amount" class="block text-sm font-medium text-gray-700">Total Price</label>
+            <input id="payment_amount" asp-for="payment_amount" type="text" readonly class="mt-1 block w-full border-0 border-b-2 border-gray-300 py-1 outline-none focus:border-gray-700 px-2" disabled/>
+            <span asp-validation-for="payment_amount" class="text-danger text-red-500"></span>
+        </div>
+
+        <div class="mb-4">
+            <input asp-for="payment_date" type="hidden" class="mt-1 block w-full border-0 border-b-2 border-gray-300 py-1 outline-none focus:border-gray-700 px-2" value="2222-11-11"/>
+        </div>
+
+        <div class="mb-4">
+            <input asp-for="payment_type" type="hidden" class="mt-1 block w-full border-0 border-b-2 border-gray-300 py-1 outline-none focus:border-gray-700 px-2" value="Hotel" />
+        </div>
+        <div class="flex justify-between">
+            <a href="@Url.Action("Index", "Payments")" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-md">Cancel</a>
+            <button type="submit" class="bg-indigo-700 hover:bg-indigo-800 text-white px-4 py-2 rounded-md">Create</button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('#booking_id').on('change', function () {
+                const bookingId = $(this).val();
+                if (bookingId) {
+                    $.post('@Url.Action("GetTotalPrice", "Payments")', { bookingId: bookingId }, function (response) {
+                        if (response.success) {
+                            $('#payment_amount').val(response.totalPrice);
+                        } else {
+                            alert(response.message || 'Failed to fetch total price.');
+                        }
+                    }).fail(function () {
+                        alert('An error occurred while fetching the total price.');
+                    });
+                }
+            });
+        });
+    </script>
+}
+

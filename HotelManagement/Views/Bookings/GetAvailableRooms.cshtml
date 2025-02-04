@@ -1,0 +1,89 @@
+﻿@model HotelManagement.Models.ViewModels.RoomAvailabilityViewModel
+
+<h2 class="flex text-4xl font-semibold mb-4 justify-center">Find Available Rooms</h2>
+
+    <form asp-action="GetAvailableRooms" method="post" class="min-w-full flex flex-wrap gap-4 items-end justify-center">
+        <div class="flex flex-col">
+            <label for="RoomType" class="block text-lg font-medium text-gray-700">Room Type:</label>
+            <select asp-for="RoomType" asp-items="ViewBag.RoomTypes" class="mt-1 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" >
+                <option value="" selected disabled>Select room type</option>
+            </select>
+        </div>
+        <div class="flex flex-col">
+            <label for="booking_range" class="block text-lg font-medium text-gray-700">Booking Dates:</label>
+            <input id="booking_range" type="text" placeholder="Select date range" class="mt-1 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" required />
+            <input type="hidden" asp-for="check_in_date" id="check_in_date" />
+            <input type="hidden" asp-for="check_out_date" id="check_out_date" />
+        </div>
+        <div class="flex flex-col">
+            <label for="PeopleCount" class="block text-lg font-medium text-gray-700">Minimal People Count:</label>
+            <input asp-for="PeopleCount" type="number" class="mt-1 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" required />
+        </div>
+        <button type="submit" class="py-2 px-4 bg-indigo-600 text-white font-semibold rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 ">
+            Search
+        </button>
+    </form>
+@if (Model.AvailableRooms?.Any() == true)   
+{
+    <h3 class="text-xl font-semibold mt-8 mb-4">Available Rooms</h3>
+    <table class="min-w-full table-auto">
+        <thead class="bg-gray-100">
+            <tr>
+                <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Room Number</th>
+                <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Room Type</th>
+                <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Bed Count</th>
+                <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Features</th>
+                <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var room in Model.AvailableRooms)
+            {
+                <tr class="border-t">
+                    <td class="px-4 py-2 text-sm text-gray-600">@room.room_number</td>
+                    <td class="px-4 py-2 text-sm text-gray-600">@room.room_type</td>
+                    <td class="px-4 py-2 text-sm text-gray-600">@room.bed_count</td>
+                    <td class="px-4 py-2 text-sm text-gray-600">@room.features</td>
+                    <td class="px-4 py-2">
+                        <form asp-action="Create" asp-controller="Bookings">
+                            <input type="hidden" name="room_id" value="@room.room_id" />
+                            <input type="hidden" name="check_in_date" value="@Model.check_in_date" />
+                            <input type="hidden" name="check_out_date" value="@Model.check_out_date" />
+                            <button type="submit" class="px-4 py-2 bg-green-600 text-white font-semibold rounded-md shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500">
+                                Book Now
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else if (Model.AvailableRooms?.Count() == 0)
+{
+    <p class="mt-20 text-lg text-gray-600 flex justify-center">No available rooms found for the selected criteria.</p>
+}
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+    $(document).ready(function () {
+        var bookedDates = []; // Fetch booked dates dynamically if necessary
+
+        $('#booking_range').flatpickr({
+            mode: "range",
+            minDate: "today",
+            disable: bookedDates,
+            dateFormat: "Y-m-d",
+            onClose: function (selectedDates) {
+                if (selectedDates.length === 2) {
+                    $('#check_in_date').val(selectedDates[0].toISOString().split('T')[0]);
+                    $('#check_out_date').val(selectedDates[1].toISOString().split('T')[0]);
+                }
+            }
+        });
+    });
+</script>
+
+

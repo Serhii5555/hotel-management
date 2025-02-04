@@ -1,0 +1,178 @@
+﻿@model HotelManagement.Models.Booking
+
+@{
+    ViewData["Title"] = "Create Booking";
+}
+
+<div class="mx-auto py-5 px-5 max-w-lg">
+    <h1 class="text-4xl font-bold text-center mb-6">Create Booking</h1>
+
+    <div class="p-4">
+        <form asp-controller="Bookings" asp-action="Create" method="post" class="space-y-4">
+            <div class="mb-4">
+                <label for="guest_id" class="block text-sm font-medium text-gray-700">Guest | ID</label>
+                <select asp-for="guest_id" asp-items="ViewBag.Guests" class="mt-1 block w-full border-0 border-b-2 border-gray-300 outline-none py-1 focus:border-gray-700 px-2">
+                    <option value="" disabled selected>Select Guest</option>
+                </select>
+                <span asp-validation-for="guest_id" class="text-danger text-red-500"></span>
+            </div>
+
+            <div class="mb-4">
+                <label for="room_id" class="block text-sm font-medium text-gray-700">Room</label>
+                <select asp-for="room_id" asp-items="ViewBag.Rooms" class="mt-1 block w-full border-0 border-b-2 border-gray-300 py-1 outline-none focus:border-gray-700 px-2">
+                    <option value="" disabled selected>Select Room</option>
+                </select>
+                <span asp-validation-for="room_id" class="text-danger text-red-500"></span>
+            </div>
+
+
+            <div class="mb-4 relative">
+                <label for="booking_range" class="block text-sm font-medium text-gray-700">Check In and Check Out Date</label>
+                <input id="booking_range" type="text" class="mt-1 block w-full border-0 border-b-2 border-gray-300 py-1 outline-none focus:border-gray-700 px-2" />
+
+                <input asp-for="check_in_date" id="check_in_date" type="hidden" value="@Model.check_in_date.ToString("yyyy-MM-dd")"/>
+                <input asp-for="check_out_date" id="check_out_date" type="hidden" value="@Model.check_out_date.ToString("yyyy-MM-dd")" />
+                <span asp-validation-for="check_out_date" class="text-danger text-red-500"></span>
+            </div>
+
+
+            <div class="mb-4">
+                <input asp-for="status" type="hidden" class="mt-1 block w-full border-0 border-b-2 border-gray-300 py-1 outline-none focus:border-gray-700" value="Booked" />
+            </div>
+            <div class="mb-4">
+                <input asp-for="total_price" type="hidden" class="mt-1 block w-full border-0 border-b-2 border-gray-300 py-1 outline-none focus:border-gray-700" value="0" />
+            </div>
+            <div class="mb-4">
+                <input asp-for="payment_status" type="hidden" class="mt-1 block w-full border-0 border-b-2 border-gray-300 py-1 outline-none focus:border-gray-700" value="Pending" />
+            </div>
+            <div class="px-3 py-1 flex justify-between">
+                <a href="@Url.Action("Index", "Bookings")" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-md mr-2">Cancel</a>
+                <button type="submit" class="bg-indigo-700 hover:bg-indigo-800 text-white px-4 py-2 rounded-md">Create</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+
+    <script>
+        $(document).ready(function () {
+            var bookedDates = [];
+
+            function initializeFlatpickr() {
+                return $('#booking_range').flatpickr({
+                    mode: "range",
+                    minDate: "today",
+                    disable: bookedDates,
+                    dateFormat: "Y-m-d",
+                    onClose: function (selectedDates) {
+                        if (selectedDates.length === 2) {
+                            $('#check_in_date').val(selectedDates[0].toLocaleDateString('en-CA'));  // yyyy-mm-dd format
+                            $('#check_out_date').val(selectedDates[1].toLocaleDateString('en-CA'));  // yyyy-mm-dd format
+
+                            var formattedRange = selectedDates[0].toLocaleDateString('en-CA') + ' to ' + selectedDates[1].toLocaleDateString('en-CA');
+                            $('#booking_range').val(formattedRange);
+                        }
+                    },
+                    onDayCreate: function (dObj, dStr, fp, dayElem) {
+                        var date = dayElem.dateObj.toLocaleDateString('en-CA');  // yyyy-mm-dd format in local timezone
+                        if (bookedDates.includes(date)) {
+                            dayElem.style.backgroundColor = "#ff00005c";
+                            dayElem.style.color = "white";
+                        }
+                    }
+                });
+            }
+
+            var checkInDatePicker = initializeFlatpickr();
+
+            // Fetch model values from Razor into JavaScript variables
+            var initialCheckInDate = '@Model.check_in_date';
+            var initialCheckOutDate = '@Model.check_out_date';
+            if (initialCheckInDate != "01.01.0001 0:00:00") {
+
+
+
+                // Check if the dates are not null or undefined
+                if (initialCheckInDate && initialCheckOutDate) {
+                    var formatDate = function (dateString) {
+                        var parts = dateString.split(' ');
+                        var dateParts = parts[0].split('.');
+                        return `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
+                    };
+
+                    var formattedCheckInDate = formatDate(initialCheckInDate);
+                    var formattedCheckOutDate = formatDate(initialCheckOutDate);
+
+                    var checkInDateObj = new Date(formattedCheckInDate);
+                    var checkOutDateObj = new Date(formattedCheckOutDate);
+
+                    if (!isNaN(checkInDateObj) && !isNaN(checkOutDateObj)) {
+                        $('#check_in_date').val(formattedCheckInDate);
+                        $('#check_out_date').val(formattedCheckOutDate);
+
+                        var formattedRange = initialCheckInDate.split(' ')[0] + ' to ' + initialCheckOutDate.split(' ')[0];
+                        $('#booking_range').val(formattedRange);
+                    } else {
+                        console.error("Invalid initial dates:", initialCheckInDate, initialCheckOutDate);
+                    }
+                }
+            }
+
+            function resetFlatpickr() {
+                // Destroy the existing Flatpickr instance
+                if ($('#booking_range').data('flatpickr')) {
+                    $('#booking_range').data('flatpickr').destroy();
+                }
+
+                // Reinitialize the Flatpickr instance
+                checkInDatePicker = initializeFlatpickr();
+            }
+
+            function updateBookedDates(roomId) {
+                if (!roomId) {
+                    return;
+                }
+
+                // Reset bookedDates and Flatpickr settings
+                bookedDates = [];
+                resetFlatpickr();
+
+                $.get('@Url.Action("GetBookedDates", "Bookings")', { roomId: roomId }, function (response) {
+                    if (response.success) {
+                        bookedDates = response.bookedDates;
+
+                        // Reinitialize Flatpickr with new disabled dates
+                        resetFlatpickr();
+                    } else {
+                        console.error(response.message);
+                    }
+                });
+            }
+
+            $('#room_id').on('change', function () {
+                var roomId = $(this).val();
+
+                // Clear inputs only if a new room is selected
+                $('#check_in_date').val('');
+                $('#check_out_date').val('');
+                $('#booking_range').val('');
+
+                updateBookedDates(roomId);
+            });
+
+            // Initialize booked dates for the preselected room (if any)
+            var initialRoomId = $('#room_id').val();
+            if (initialRoomId) {
+                updateBookedDates(initialRoomId);
+            }
+        });
+
+
+    </script>
+}
+

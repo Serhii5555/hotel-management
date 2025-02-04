@@ -1,0 +1,65 @@
+﻿@* Views/Shared/_SearchBar.cshtml *@
+
+<div class="flex justify-center items-center my-4">
+    <div class="relative w-full max-w-md flex">
+        <input type="text" id="searchInput" placeholder="Search..."
+               class="w-full py-2 pl-10 pr-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+
+        <button id="clearButton"
+                class="absolute left-2 top-1/2 transform -translate-y-1/2 bg-gray-200 hover:bg-gray-300 text-gray-600 w-6 h-6 rounded-full flex justify-center items-center hidden">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+
+        <button id="searchButton"
+                class="ml-2 bg-indigo-800 hover:bg-indigo-900 text-white px-3 py-2 rounded-lg">
+            <svg fill="#ffffff" class="w-4 h-4" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="-19.54 -19.54 527.48 527.48" xml:space="preserve" stroke="#ffffff" stroke-width="30.7692"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g> <g> <path d="M0,203.25c0,112.1,91.2,203.2,203.2,203.2c51.6,0,98.8-19.4,134.7-51.2l129.5,129.5c2.4,2.4,5.5,3.6,8.7,3.6 s6.3-1.2,8.7-3.6c4.8-4.8,4.8-12.5,0-17.3l-129.6-129.5c31.8-35.9,51.2-83,51.2-134.7c0-112.1-91.2-203.2-203.2-203.2 S0,91.15,0,203.25z M381.9,203.25c0,98.5-80.2,178.7-178.7,178.7s-178.7-80.2-178.7-178.7s80.2-178.7,178.7-178.7 S381.9,104.65,381.9,203.25z"></path> </g> </g> </g></svg>
+        </button>
+    </div>
+</div>
+
+<script>
+    const searchInput = document.getElementById("searchInput");
+    const searchButton = document.getElementById("searchButton");
+    const clearButton = document.getElementById("clearButton");
+
+    const filterRows = () => {
+        const query = searchInput.value.trim().toLowerCase();
+        const rows = document.querySelectorAll("tbody tr");
+
+        rows.forEach(row => {
+            const rowText = row.textContent.toLowerCase();
+            if (rowText.includes(query)) {
+                row.classList.remove("hidden");
+            } else {
+                row.classList.add("hidden");
+            }
+        });
+    };
+
+    const clearSearch = () => {
+        searchInput.value = "";
+        clearButton.classList.add("hidden");
+        const rows = document.querySelectorAll("tbody tr");
+        rows.forEach(row => row.classList.remove("hidden"));
+    };
+
+    const toggleClearButton = () => {
+        if (searchInput.value.trim()) {
+            clearButton.classList.remove("hidden");
+        } else {
+            clearButton.classList.add("hidden");
+        }
+    };
+
+    searchButton.addEventListener("click", filterRows);
+    clearButton.addEventListener("click", clearSearch);
+
+    searchInput.addEventListener("input", toggleClearButton);
+    searchInput.addEventListener("keypress", (event) => {
+        if (event.key === "Enter") {
+            filterRows();
+        }
+    });
+</script>

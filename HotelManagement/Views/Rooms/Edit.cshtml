@@ -1,0 +1,63 @@
+﻿@model HotelManagement.Models.Room
+
+@{
+    ViewData["Title"] = "Edit Room";
+    var roomTypes = ViewBag.RoomTypes as IEnumerable<HotelManagement.Models.RoomType>;
+}
+
+<div class="mx-auto py-5 px-5 max-w-lg">
+    <h1 class="text-4xl font-bold text-center mb-6">Edit Room</h1>
+
+    <form asp-action="Edit" method="post" class="space-y-4">
+        <input asp-for="room_id" type="hidden" />
+
+        <div class="mb-4">
+            <label for="room_number" class="block text-sm font-medium text-gray-700">Room Number</label>
+            <input asp-for="room_number" type="text" class="mt-1 block w-full border-0 border-b-2 border-gray-300 py-1 outline-none focus:border-gray-700 px-2" maxlength="10" required />
+            <span asp-validation-for="room_number" class="text-danger text-red-500"></span>
+        </div>
+
+        <div class="mb-4">
+            <label for="room_type_id" class="block text-sm font-medium text-gray-700">Room Type</label>
+            <select asp-for="room_type_id" class="mt-1 block w-full border-0 border-b-2 border-gray-300 py-1 outline-none focus:border-gray-700 px-2">
+                <option value="" disabled selected>Select Room Type</option>
+                @if (roomTypes != null)
+                {
+                    foreach (var type in roomTypes)
+                    {
+                        <option value="@type.room_type_id">@type.name</option>
+                    }
+                }
+            </select>
+            <span asp-validation-for="room_type_id" class="text-danger text-red-500"></span>
+        </div>
+
+        <div class="mb-4">
+            <label for="availability" class="block text-sm font-medium text-gray-700">Availability</label>
+            <input asp-for="availability" type="checkbox" value="True" class="mt-1 py-1 px-2 w-6 h-6 bg-gray-200 border-gray-500 outline-none rounded-lg" />
+        </div>
+
+        <div class="mb-4">
+            <label for="bed_count" class="block text-sm font-medium text-gray-700">Bed Count</label>
+            <input asp-for="bed_count" type="number" class="mt-1 block w-full border-0 border-b-2 border-gray-300 py-1 outline-none focus:border-gray-700 px-2" />
+            <span asp-validation-for="bed_count" class="text-danger text-red-500"></span>
+        </div>
+
+        <div class="mb-4">
+            <label for="features" class="block text-sm font-medium text-gray-700">Features</label>
+            <textarea asp-for="features" class="mt-1 block w-full border-0 border-b-2 border-gray-300 py-1 outline-none focus:border-gray-700 px-2"></textarea>
+            <span asp-validation-for="features" class="text-danger text-red-500"></span>
+        </div>
+
+        <div class="flex justify-between">
+            <a href="@Url.Action("Index", "Rooms")" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-md">Cancel</a>
+            <button type="submit" class="bg-indigo-700 hover:bg-indigo-800 text-white px-4 py-2 rounded-md">Update</button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

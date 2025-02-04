@@ -1,0 +1,71 @@
+﻿@model HotelManagement.Models.Booking
+
+@{
+    ViewData["Title"] = "Edit Booking";
+}
+
+<div class="mx-auto py-5 px-5 max-w-lg">
+    <h1 class="text-4xl font-bold text-center mb-6">Edit Booking</h1>
+
+    <div class="p-4">
+        <form asp-controller="Bookings" asp-action="Edit" method="post" class="space-y-4">
+            <input asp-for="booking_id" type="hidden" />
+            <div class="mb-4">
+                <label for="guest_id" class="block text-sm font-medium text-gray-700">Guest | ID</label>
+                <select asp-for="guest_id" asp-items="ViewBag.Guests" class="mt-1 block w-full border-0 border-b-2 border-gray-300 outline-none py-1 focus:border-gray-700 px-2">
+                </select>
+                <span asp-validation-for="guest_id" class="text-danger text-red-500"></span>
+            </div>
+
+            <div class="mb-4">
+                <label for="room_id" class="block text-sm font-medium text-gray-700">Room</label>
+                <select asp-for="room_id" asp-items="ViewBag.Rooms" class="mt-1 block w-full border-0 border-b-2 border-gray-300 py-1 outline-none focus:border-gray-700 px-2">
+                </select>
+                <span asp-validation-for="room_id" class="text-danger text-red-500"></span>
+            </div>
+
+            <div class="mb-4">
+                <label for="check_in_date" class="block text-sm font-medium text-gray-700">Check In Date</label>
+                <input asp-for="check_in_date" type="date" class="mt-1 block w-full border-0 border-b-2 border-gray-300 py-1 outline-none focus:border-gray-700 px-2" />
+                <span asp-validation-for="check_in_date" class="text-danger text-red-500"></span>
+            </div>
+            <div class="mb-4">
+                <label for="check_out_date" class="block text-sm font-medium text-gray-700">Check Out Date</label>
+                <input asp-for="check_out_date" type="date" class="mt-1 block w-full border-0 border-b-2 border-gray-300 py-1 outline-none focus:border-gray-700 px-2" />
+                <span asp-validation-for="check_out_date" class="text-danger text-red-500"></span>
+            </div>
+            <div class="mb-4">
+                <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
+                <select asp-for="status" class="mt-1 block w-full border-0 border-b-2 border-gray-300 py-1 outline-none focus:border-gray-700 px-2">
+                    <option value="Booked">Booked</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Completed">Completed</option>
+                </select>
+                <span asp-validation-for="status" class="text-danger text-red-500"></span>
+            </div>
+            <div class="mb-4">
+                <label for="total_price" class="block text-sm font-medium text-gray-700">Total Price</label>
+                <input asp-for="total_price" type="number" class="mt-1 block w-full border-0 border-b-2 border-gray-300 py-1 outline-none focus:border-gray-700 px-2" />
+                <span asp-validation-for="total_price" class="text-danger text-red-500"></span>
+            </div>
+            <div class="mb-4">
+                <label for="payment_status" class="block text-sm font-medium text-gray-700">Payment Status</label>
+                <select asp-for="payment_status" class="mt-1 block w-full border-0 border-b-2 border-gray-300 py-1 outline-none focus:border-gray-700 px-2">
+                    <option value="Pending">Pending</option>
+                    <option value="Completed">Completed</option>
+                </select>               
+                <span asp-validation-for="payment_status" class="text-danger text-red-500"></span>
+            </div>
+            <div class="px-3 py-1 flex justify-between">
+                <a href="@Url.Action("Index", "Bookings")" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-md mr-2">Cancel</a>
+                <button type="submit" class="bg-indigo-700 hover:bg-indigo-800 text-white px-4 py-2 rounded-md">Update</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -1,0 +1,75 @@
+﻿@model HotelManagement.Models.ViewModels.ServicePaymentViewModel
+
+@{
+    ViewData["Title"] = "Create Service Payment";
+    var bookings = Model.Bookings;
+}
+
+<div class="mx-auto py-5 px-5 max-w-lg">
+    <h1 class="text-4xl font-bold text-center mb-6">Create Service Payment</h1>
+
+    <form asp-controller="Payments" asp-action="ServicePaymentCreate" method="post" class="space-y-4">
+        <div class="mb-4">
+            <label for="bookingDropdown" class="block text-sm font-medium text-gray-700">Booking ID | Guest Full Name | Room Number</label>
+            <select asp-for="booking_id" class="mt-1 block w-full border-0 border-b-2 border-gray-300 py-1 outline-none focus:border-gray-700 px-2">
+                <option value="" disabled selected>Select Booking</option>
+                @foreach (var booking in bookings)
+                {
+                    <option value="@booking.booking_id">@booking.full_booking_display</option>
+                }
+            </select>
+            <span asp-validation-for="booking_id" class="text-red-500 text-sm"></span>
+        </div>
+
+        <div class="mb-4">
+            <label for="serviceDropdown" class="block text-sm font-medium text-gray-700">Service</label>
+            <select id="serviceDropdown" asp-for="service_id" class="mt-1 block w-full border-0 border-b-2 border-gray-300 py-1 outline-none focus:border-gray-700 px-2">
+                <option value="" disabled selected>Select Service</option>
+                @foreach (var service in Model.Services)
+                {
+                    <option value="@service.Value">@service.Text</option>
+                }
+            </select>
+            <span asp-validation-for="service_id" class="text-red-500 text-sm"></span>
+        </div>
+
+        <div class="mb-4">
+            <label for="service_amount" class="block text-sm font-medium text-gray-700">Service Price</label>
+            <input id="service_amount" type="text" readonly class="mt-1 block w-full border-0 border-b-2 border-gray-300 py-1 outline-none focus:border-gray-700 px-2" disabled />
+        </div>
+
+        <input id="payment_type" name="payment_type" type="hidden" value="Service" />
+
+        <div class="flex justify-between">
+            <a href="@Url.Action("Index", "Payments")" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-md">Cancel</a>
+            <button type="submit" class="bg-indigo-700 hover:bg-indigo-800 text-white px-4 py-2 rounded-md">Create</button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+     }
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('#serviceDropdown').on('change', function () {
+                const serviceId = $(this).val();
+                if (serviceId) {
+                    $.post('@Url.Action("GetServicePrice", "Payments")', { serviceId: serviceId }, function (response) {
+                        if (response.success) {
+                            $('#service_amount').val(response.servicePrice);
+                        } else {
+                            alert(response.message || 'Failed to fetch service price.');
+                        }
+                    }).fail(function () {
+                        alert('An error occurred while fetching the service price.');
+                    });
+                }
+            });
+        });
+    </script>
+}

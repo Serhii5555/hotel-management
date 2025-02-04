@@ -1,0 +1,20 @@
+﻿/* Apply custom focus style */
+[multiple]:focus,
+[type=date]:focus,
+[type=datetime-local]:focus,
+[type=email]:focus,
+[type=month]:focus,
+[type=number]:focus,
+[type=password]:focus,
+[type=search]:focus,
+[type=tel]:focus,
+[type=text]:focus,
+[type=time]:focus,
+[type=url]:focus,
+[type=week]:focus,
+select:focus,
+textarea:focus {
+    box-shadow: none; /* Remove box shadow */
+    outline: none; /* Lighter outline */
+    border-color: rgb(55 65 81 / var(--tw-border-opacity, 1));
+}

@@ -24,8 +24,8 @@ namespace HotelManagement.Controllers
 
         private async Task PopulateViewBagAsync()
         {
-            ViewBag.Guests = new SelectList(await _guests.GetAllGuestsAsync(), "guest_id", "guest_display");
-            ViewBag.Rooms = new SelectList(await _rooms.GetAllRoomsAsync(), "room_id", "room_number");
+            ViewBag.Guests = new SelectList(await _guests.GetAllGuestsAsync(), nameof(Guest.guest_id), nameof(Guest.guest_display));
+            ViewBag.Rooms = new SelectList(await _rooms.GetAllRoomsAsync(), nameof(Room.room_id), nameof(Room.room_number));
         }
 
 

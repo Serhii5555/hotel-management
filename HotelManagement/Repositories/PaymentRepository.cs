@@ -17,7 +17,6 @@ namespace HotelManagement.Repositories
             _database = database;
         }
 
-        // Get all payments
         public async Task<IEnumerable<Payment>> GetAllPaymentsAsync()
         {
             using (var connection = _database.CreateConnection())
@@ -40,7 +39,6 @@ namespace HotelManagement.Repositories
             }
         }
 
-        // Get a specific payment by payment_id
         public async Task<Payment> GetPaymentByIdAsync(int paymentId)
         {
             using (var connection = _database.CreateConnection())
@@ -50,7 +48,6 @@ namespace HotelManagement.Repositories
             }
         }
 
-        // Create a new payment
         public async Task<int> CreatePaymentAsync(Payment payment)
         {
             using (var connection = _database.CreateConnection())
@@ -63,7 +60,6 @@ namespace HotelManagement.Repositories
             }
         }
 
-        // Update an existing payment
         public async Task<bool> UpdatePaymentAsync(Payment payment)
         {
             using (var connection = _database.CreateConnection())
@@ -80,7 +76,6 @@ namespace HotelManagement.Repositories
             }
         }
 
-        // Delete a payment by payment_id
         public async Task<bool> DeletePaymentAsync(int paymentId)
         {
             using (var connection = _database.CreateConnection())
@@ -110,12 +105,10 @@ namespace HotelManagement.Repositories
 
                 var result = await connection.QueryFirstOrDefaultAsync<dynamic>(query, parameters, commandType: CommandType.StoredProcedure);
 
-                if (result != null && result.total_cost != null)
-                {
-                    return Convert.ToDecimal(result.total_cost);
-                }
+                if(result?.total_cost == null || result?.total_cost is DBNull)
+                    throw new Exception("Total price calculation failed or booking not found.");
 
-                throw new Exception("Total price calculation failed or booking not found.");
+                return Convert.ToDecimal(result?.total_cost);
             }
         }
     }

@@ -59,7 +59,7 @@ namespace HotelManagement.Controllers
         public async Task<IActionResult> HotelPaymentCreate(Payment model)
         {
             ViewBag.Bookings = await _bookings.GetBookingsByPaymentStatusAsync("Pending");
-                
+
             if (ModelState.IsValid)
             {
                 var totalPrice = await _payments.CalculateTotalPriceAsync(model.booking_id);
@@ -70,7 +70,7 @@ namespace HotelManagement.Controllers
                     payment_date = DateTime.Now,
                     payment_type = "Hotel"
                 };
-                    
+
                 await _payments.CreatePaymentAsync(payment);
 
                 return RedirectToAction("HotelPayments", "Payments");
@@ -113,54 +113,65 @@ namespace HotelManagement.Controllers
 
         public async Task<IActionResult> ServicePaymentCreate()
         {
-            var model = new ServicePaymentViewModel
-            {
-                Services = new SelectList(await _services.GetAllServicesAsync(), "service_id", "service_name"),
-                Bookings = await _bookings.GetBookingsByStatusAsync("Pending")
-            };
+            var model = new ServicePaymentViewModel();
+            await PrepareServicePaymentViewModel(model);
             return View(model);
         }
 
         [HttpPost]
         public async Task<IActionResult> ServicePaymentCreate(ServicePaymentViewModel model)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                var service = await _services.GetServiceByIdAsync(model.service_id);
-                if (service == null)
-                {
-                    ModelState.AddModelError("", "Service not found.");
-                    return View(model);
-                }
-
-                var payment = new Payment
-                {
-                    booking_id = model.booking_id,
-                    payment_amount = service.price,
-                    payment_date = DateTime.Now,
-                    payment_type = "Service"
-                };
-
-                var paymentId = await _payments.CreatePaymentAsync(payment);
-
-                var paymentService = new PaymentService
-                {
-                    payment_id = paymentId,
-                    service_id = model.service_id,
-                    service_amount = service.price
-                };
-
-                await _paymentServices.CreatePaymentServiceAsync(paymentService);
-
-                return RedirectToAction("ServicePayments", "Payments");
+                await PrepareServicePaymentViewModel(model);
+                return View(model);
             }
 
-            model.Services = new SelectList(await _services.GetAllServicesAsync(), "service_id", "service_name");
-            model.Bookings = await _bookings.GetBookingsByStatusAsync("Pending");
+            var service = await _services.GetServiceByIdAsync(model.service_id);
+            if (service == null)
+            {
+                ModelState.AddModelError("", "Service not found.");
+                await PrepareServicePaymentViewModel(model);
+                return View(model);
+            }
 
-            return View(model);
+            var payment = await CreatePaymentAsync(model.booking_id, service.price);
+            await CreatePaymentServiceAsync(payment, model.service_id, service.price);
+
+            return RedirectToAction("ServicePayments", "Payments");
         }
 
+        private async Task<Payment> CreatePaymentAsync(int bookingId, decimal amount)
+        {
+            var payment = new Payment
+            {
+                booking_id = bookingId,
+                payment_amount = amount,
+                payment_date = DateTime.Now,
+                payment_type = "Service"
+            };
+
+            payment.payment_id = await _payments.CreatePaymentAsync(payment);
+            return payment;
+        }
+
+        private async Task CreatePaymentServiceAsync(Payment payment, int serviceId, decimal amount)
+        {
+            var paymentService = new PaymentService
+            {
+                payment_id = payment.payment_id,
+                service_id = serviceId,
+                service_amount = amount
+            };
+
+            await _paymentServices.CreatePaymentServiceAsync(paymentService);
+        }
+
+        private async Task PrepareServicePaymentViewModel(ServicePaymentViewModel model)
+        {
+            model.Services = new SelectList(await _services.GetAllServicesAsync(), "service_id", "service_name");
+            model.Bookings = await _bookings.GetBookingsByStatusAsync("Pending");
+        }
 
         [HttpPost]
         public async Task<IActionResult> GetServicePrice(int serviceId)
@@ -175,4 +186,4 @@ namespace HotelManagement.Controllers
 
 
     }
-}   
+}
